@@ -5,11 +5,11 @@ class Borrowing {
         this.id = id;
         this.bookId = book_id;
         this.borrowerId = borrower_id;
-        this.borrowingDate = Temporal.Now.toPlainDateISO('Europe/Warsaw');
-        this.borrowingDueDate = this.borrowingDate.add({days: 14});
+        this.borrowDate = Temporal.Now.toPlainDateISO('Europe/Warsaw');
+        this.borrowDueDate = this.borrowingDate.add({days: 14});
     }
     
     setReturnDate(date_string) {
-        this.returbDate = Temporal.PlainDate.from(date_string);
+        this.returnDate = Temporal.PlainDate.from(date_string);
     }
 }

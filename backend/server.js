@@ -56,9 +56,8 @@ app.delete('/borrower/:id', async (req, res) => {
 
 //  puts
 app.put('/return/:uid/:bid', async (req, res) => {
-  
-});
 
+});
 
 
 app.use((req, res) => {
