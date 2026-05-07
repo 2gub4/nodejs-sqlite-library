@@ -12,9 +12,53 @@ const HOST_NAME = 'localhost';
 const db = require(DB_PATH);
 const app = express();
 
+//middlewares
 app.use(express.json());
 
 //endpoints
+
+//  gets
+app.get('/book/:id', async (req, res) => {
+
+});
+
+app.get('/borrower/:id', async (req, res) => {
+
+});
+
+app.get('/borrowing/:id', async(req, res) => {
+
+});
+
+
+//  posts
+app.post('/book', async (req, res) => {
+  
+});
+
+app.post('/borrower', async (req, res) => {
+  
+});
+
+app.post('/borrow/:uid/:bid', async (req,res) => {
+
+});
+
+
+//  deletes
+app.delete('/book/:id', async (req, res) => {
+
+});
+
+app.delete('/borrower/:id', async (req, res) => {
+
+});
+
+//  puts
+app.put('/return/:uid/:bid', async (req, res) => {
+  
+});
+
 
 
 app.use((req, res) => {
