@@ -22,8 +22,8 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
-app.get('/borrowable_books_ids', (req, res) => {
-  db.all('SELECT id FROM books WHERE availability = 1;', [], (err, rows) => {
+app.get('/books_ids/:mode', (req, res) => {
+  db.all('SELECT id FROM books WHERE availability = ?;', [req.params.mode], (err, rows) => {
     if (err) {
       console.error("database error:", err);
       return res.status(500).json({ error: 'Internal server error' });
@@ -33,18 +33,8 @@ app.get('/borrowable_books_ids', (req, res) => {
   });
 });
 
-app.get('/returnable_books_ids', (req, res) => {
-  db.all('SELECT id FROM books WHERE availability = 0;', [], (err, rows) => {
-    if (err) {
-      console.error("database error:", err);
-      return res.status(500).json({ error: 'Internal server error' });
-    }
-    const ids = rows.map(row => row.id);
-    res.json(ids);
-  });
-});
 
-app.get('/borrowers_ids', async (req, res) => {
+app.get('/borrowers_ids/:mode', async (req, res) => {
   db.all('SELECT id FROM library_card;', [], (err, rows) => {
     if (err) {
       console.error("database error:", err);
@@ -84,11 +74,29 @@ app.post('/borrow/:uid/:bid', async (req,res) => {
 
 //  deletes
 app.delete('/book/:id', async (req, res) => {
-
+  db.run('DELETE FROM books WHERE id = ?;', [req.params.id], function(err) {
+    if (err) {
+      console.error("database error:", err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Book not found' });
+    }
+    res.json({ message: `Book deleted successfully. Book's ID: ${req.params.id}` });
+  });
 });
 
-app.delete('/borrower/:id', async (req, res) => {
-
+app.delete('/borrower/:id', (req, res) => {
+  db.run('DELETE FROM library_card WHERE id = ?;', [req.params.id], function(err) {
+    if (err) {
+      console.error("database error:", err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Borrower not found' });
+    }
+    res.json({ message: `Borrower deleted successfully. Borrower's ID: ${req.params.id}` });
+  });
 });
 
 //  puts

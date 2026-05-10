@@ -49,18 +49,52 @@ const addBookButton = document.getElementById('add-book');
 //      searches
 const searchTitleInput = document.getElementById('book-search-title');
 const searchBookButton = document.getElementById('search-book');
+const searchBorrowerNameInput = document.getElementById('borrower-search-name');
+const searchBorrowerButton = document.getElementById('search-borrower');
 
 
 let borrowableBooks;
 let returnableBooks;
 let availableBorrowers;
 let currentBorrowerId;
+let bookToBorrowId;
+let bookToReturnId;
+let bookToDeleteId;
+const selects = [borrowerSelect, bookToBorrowSelect, bookToReturnSelect, bookToDeleteSelect];
 
 //  initialization
-initWebsite();
+initializeWebsite();
 
 
 // event listeners
+selects.forEach(select => {
+    select.addEventListener('change', (event) => {
+        selectId = event.target.id;
+        selectValue = event.target.value;
+        if (selectValue === "default" || selectValue === "empty") return;
+        switch (selectId) {
+            case 'borrower-select':
+                currentBorrowerId = selectValue;
+                //console.log(`current borrower id: ${currentBorrowerId}`);
+                break;
+            case 'book-by-id':
+                bookToBorrowId = selectValue;
+                //console.log(`book to borrow id: ${bookToBorrowId}`);
+                break;
+            case 'book-to-return':
+                bookToReturnId = selectValue;
+                //console.log(`book to return id: ${bookToReturnId}`);
+                break;
+            case 'book-to-delete':
+                bookToDeleteId = selectValue;
+                //console.log(`book to delete id: ${bookToDeleteId}`);
+                break;
+            default:
+                console.error(`unknown select id: ${selectId}`);
+        }
+    });
+});
+
 addBorrowerForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const form = new FormData(addBorrowerForm);
@@ -83,23 +117,33 @@ addBookForm.addEventListener('submit', async (event) => {
     // display information on succes/failure
 });
 
+deleteBorrowerButton.addEventListener('click', async () => {
+    if (!currentBorrowerId) return;
+    await deleteBorrower(currentBorrowerId);
+});
+
+deleteBookButton.addEventListener('click', async () => {
+    if (!bookToDeleteId) return;
+    await deleteBook(bookToDeleteId);
+});
+
 // functions
-async function initWebsite() {
+async function initializeWebsite() {
     overdueInfo.style.display = 'none';
-    borrowableBooks = await getAvailableIds('borrowable_books');
-    returnableBooks = await getAvailableIds('returnable_books');
-    availableBorrowers = await getAvailableIds('borrowers');
-    populateSelectOptions(borrowerSelect, availableBorrowers);
-    populateSelectOptions(bookToBorrowSelect, borrowableBooks);
-    populateSelectOptions(bookToReturnSelect, returnableBooks);
-    populateSelectOptions(bookToDeleteSelect, borrowableBooks/*[...borrowableBooks, ...returnableBooks]*/);
-    //currentBorrowerId
+    borrowableBooks = await getAvailableIds('books', 1);
+    returnableBooks = await getAvailableIds('books', 0);
+    availableBorrowers = await getAvailableIds('borrowers', 'all');
+    await populateSelectOptions(borrowerSelect, availableBorrowers);
+    await populateSelectOptions(bookToBorrowSelect, borrowableBooks);
+    await populateSelectOptions(bookToReturnSelect, returnableBooks);
+    await populateSelectOptions(bookToDeleteSelect, borrowableBooks);
+    //currentBorrowerId <- maybe some default value to prevent some actions
 }
 
-async function getAvailableIds(target) {
+async function getAvailableIds(target, mode) {
     try {
         const response = await fetch(
-            `${BASE_URL}/${target}_ids`,
+            `${BASE_URL}/${target}_ids/${mode}`,
             {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
@@ -116,8 +160,40 @@ async function getAvailableIds(target) {
     }
 }
 
+async function deleteBorrower(borrowerId) {
+    try {
+        const response = await fetch(
+            `${BASE_URL}/borrower/${borrowerId}`,
+            { method: 'DELETE' }
+        );
+        const resJson = await response.json();
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} - ${resJson.error}`);
+        }
+        await populateSelectOptions(borrowerSelect, await getAvailableIds('borrowers', 'all'));
+    } catch (err) {
+        console.log(err);
+    }
+}
 
-function populateSelectOptions(targetSelect, idList) {
+async function deleteBook(bookId) {
+    try {
+        const response = await fetch(
+            `${BASE_URL}/book/${bookId}`,
+            { method: 'DELETE' }
+        );
+        const resJson = await response.json();
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} - ${resJson.error}`);
+        }
+        await populateAllBookSelects();
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
+async function populateSelectOptions(targetSelect, idList) {
     targetSelect.replaceChildren();
     if (idList && idList.length !== 0) {
         const defaultOption = document.createElement('option');
@@ -139,4 +215,10 @@ function populateSelectOptions(targetSelect, idList) {
         emptyOption.selected = true;
         targetSelect.appendChild(emptyOption);
     }
+}
+
+async function populateAllBookSelects() {
+    await populateSelectOptions(bookToBorrowSelect, await getAvailableIds('books', 1));
+    await populateSelectOptions(bookToReturnSelect, await getAvailableIds('books', 0));
+    await populateSelectOptions(bookToDeleteSelect, await getAvailableIds('books', 1));
 }
