@@ -11,73 +11,156 @@
 <body>
     <h1>Web Library</h1>
     <hr class="separator">
-    <div id="borrower-selection">
-        <fieldset>
-                    <legend>Borrower</legend>
-                    <label for="borrowers">Library card ID:&nbsp</label>
-                    <select name="borrowers" id="borrower-select">
-                        <!--updates every time new user is created-->
-                        <option value="empty" selected>No borrowers registered</option>
-                    </select>
-        </fieldset>
-    </div>
-    <hr>
-    <div id="book-borrowing">
-        <fieldset>
-            <legend>Borrow</legend>
-            <label for="book-by-id">Choose desired book ID:&nbsp</label>
-            <select name="book-by-id" id="books">
-                <!--also update, but fill only with available books-->
-                <option value="empty" selected>No books available</option>
-            </select>
-            <br>
-            <p>or</p>
-            <label for="book-by-title">Enter book's title:&nbsp</label>
-            <input type="text" name="book-by-title" id="title"/>
-            <br><br>
-            <button type="button" id="borrow">Borrow book</button>
-        </fieldset>
-    </div>
-    <hr>
-    <div id="book-returning">
-        <fieldset>
-            <legend>Return</legend>
-            <label for="book-by-id-ret">Choose book you want to return ID:&nbsp</label>
-            <select name="book-by-id-ret" id="books-to-return">
-                <!--also update, but fill only with available books-->
-                <option value="empty" selected>No books borrowed</option>
-            </select>
-            <br>
-            <p>or</p>
-            <label for="book-by-title-ret">Enter book's title:&nbsp</label>
-            <input type="text" name="book-by-title-ret" id="title-ret"/>
-            <br><br>
-            <button type="button" id="return">Return book</button>
-            <span id="overdue-info">&nbsp&nbspBook overdue! You'll be fined!</span><!--to be hidden by default in script.js-->
-        </fieldset>
-    </div>
-    <hr>
-    <br><br><br><br>
+        <div id="borrower-selection">
+            <fieldset>
+                <br>
+                <legend>Choose borrower</legend>
+                <label for="borrowers">Library card ID:&nbsp</label>
+                <select name="borrowers" id="borrower-select">
+                    <!--updates every time new user is created-->
+                    <option id="empty-borrower-option" value="empty" selected>No borrowers registered</option>
+                    <option value="default"></option>
+                    <option value="1">1</option>
+                </select>
+            </fieldset>
+        </div>
+        <br>
     <hr class="separator">
-    <div id="borrower-deletion">
-        <fieldset>
-            <legend>Borrower deletion</legend>
-            <label for="delete-user">Remove current borrower from library management system:&nbsp</label>
-            <button type="button" name="delete-user" id="delete-user" class="deletion-button">Delete borrower</button>
-        </fieldset>
+    <div id="borrowing-management">
+        <h2>Manage borrowings</h2>
+        <div id="book-borrowing">
+            <fieldset>
+                <br>
+                <legend>Borrow</legend>
+                <label for="book-by-id">Choose desired book ID:&nbsp</label>
+                <select name="book-by-id" id="book-by-id">
+                    <!--also update, but fill only with available books-->
+                    <option value="empty" selected>No books available</option>
+                </select>
+                <br>
+                <p>or</p>
+                <label for="book-by-title">Enter book's title:&nbsp</label>
+                <input type="text" name="book-by-title" id="book-title"/>
+                <br><br>
+                <button type="button" id="borrow">Borrow book</button>
+            </fieldset>
+        </div>
+        <br>
+        <div id="book-returning">
+            <fieldset>
+                <br>
+                <legend>Return</legend>
+                <label for="book-by-id-ret">Choose book you want to return ID:&nbsp</label>
+                <select name="book-by-id-ret" id="book-to-return">
+                    <!--also update, but fill only with available books-->
+                    <option value="empty" selected>No books borrowed</option>
+
+                </select>
+                <br>
+                <p>or</p>
+                <label for="book-by-title-ret">Enter book's title:&nbsp</label>
+                <input type="text" name="book-by-title-ret" id="title-ret"/>
+                <br><br>
+                <button type="button" id="return">Return book</button>
+                <span id="overdue-info">&nbsp&nbspBook overdue! You'll be fined!</span><!--to be hidden by default in script.js-->
+            </fieldset>
+        </div>
     </div>
-    <hr>
-    <div id="book-deletion">
-        <fieldset>
-            <legend>Book deletion</legend>
-            <label for="book-to-delete">Choose ID of a book to remove from the library:&nbsp</label>
-            <select name="book-to-delete" id="book-to-delete">
-                <option value="empty" selected>No books available</option>
-                <!--display only books that are in the database and not deleted-->
-            </select>
-            <button type="button" id="delete-user" class="deletion-button">Delete book</button>
-        </fieldset>
+    <br><br>
+    <hr class="separator">
+    <div id="search-library">
+        <h2>Search</h2>
+        <div id="book-searching">
+            <fieldset>
+                <br>
+                <legend>Search book</legend>
+                <label for="book-search-id">Book ID:&nbsp</label>
+                <select name="book-search-id" id="book-search-id">
+                    <!--also update, but fill only with available books-->
+                    <option value="empty" selected>No books available</option>
+                </select>
+                <button type="button" id="search-book">Search book</button>
+                <br>
+            </fieldset>
+        </div>
+        <br><br>
+        <div id="search-lib-cards">
+            <fieldset>
+                <br>
+                <legend>Search borrower</legend>
+                <label for="borrower-search-id">Borrower ID:&nbsp</label>
+                <select name="borrower-search-id" id="borrower-search-id">
+                    <!--also update, but fill only with available borrowers-->
+                    <option value="empty" selected>No borrowers available</option>
+                </select>
+                <button type="button" id="search-borrower">Search borrower</button>
+                <br>
+            </fieldset>
+        </div>
     </div>
+    <br><br>
+    <hr class="separator">
+    <div id="deletions">
+        <h2>Delete</h2>
+        <div id="borrower-deletion">
+            <fieldset>
+                <br>
+                <legend>Borrower deletion</legend>
+                <label for="delete-borrower">Remove current borrower from library management system:&nbsp</label>
+                <button type="button" name="delete-user" id="delete-borrower" class="deletion-button">Delete borrower</button>
+            </fieldset>
+        </div>
+        <br>
+        <div id="book-deletion">
+            <fieldset>
+                <br>
+                <legend>Book deletion</legend>
+                <label for="book-to-delete">Choose ID of a book to remove from the library:&nbsp</label>
+                <select name="book-to-delete" id="book-to-delete">
+                    <option value="empty" selected>No books available</option>
+                    <!--display only books that are in the database and not deleted-->
+                </select>
+                <button type="button" id="delete-book" class="deletion-button">Delete book</button>
+            </fieldset>
+        </div>
+    </div>
+    <br><br>
+    <hr class="separator">
+    <div id="additions">
+        <h2>Create/Add</h2>
+        <div id="library-card-creation">
+            <form id="borrower-form">
+                <fieldset>
+                    <br>
+                    <legend>Library card (borrower) creation</legend>
+                    <label for="owner-name">First name: </label>
+                    <input type="text" id="owner-name" name="owner-name" required/>
+                    <br><br>
+                    <label for="owner-last-name">Last name: </label>
+                    <input type="text" id="owner-last-name" name="owner-last-name" required/>
+                    <br><br>
+                    <button type="submit" name="add-borrower" id="add-borrower" class="creation-button">Create borrower</button>
+                </fieldset>
+            </form>
+        </div>
+        <br>
+        <div id="book-addition">
+            <form id="book-form">
+                <fieldset>
+                    <br>
+                    <legend>Add book</legend>
+                    <label for="book-title">Book's title: </label>
+                    <input type="text" id="book-title" name="book-title" required/>
+                    <br><br>
+                    <label for="book-author">Author: </label>
+                    <input type="text" id="book-author" name="book-author" required/>
+                    <br><br>
+                    <button type="submit" name="add-book" id="add-book" class="creation-button">Add book</button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    <br><br>
     <hr class="separator">
 </body>
 </html>

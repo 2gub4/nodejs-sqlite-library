@@ -13,7 +13,12 @@ button {
     background-color: white;
     margin-top: 10px;
     margin-bottom: 4px;
-    /*margin-left: 6px;*/
+}
+
+select {
+    size: 120%;
+    font-size: inherit;
+    background-color: white;
 }
 
 hr {
@@ -33,6 +38,15 @@ h1 {
     border: 1px solid red;
     color: white;
     background-color: #dd787d;
+    size: 120%;
+    font-size: inherit;
+    margin-left: 4px;
+}
+
+.creation-button {
+    border: 1px solid green;
+    color: black;
+    background-color: lightgreen;
     size: 120%;
     font-size: inherit;
     margin-left: 4px;
