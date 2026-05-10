@@ -1,0 +1,60 @@
+body {
+    background-color: #282828;
+    color: white;
+    font-size: 16px;
+    font-family: sans-serif;
+}
+
+button {
+    size: 120%;
+    font-size: inherit;
+    color: black;
+    border: 1px solid white;
+    background-color: white;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    /*margin-left: 6px;*/
+}
+
+hr {
+    color: white;
+}
+
+div, h1 {
+    padding-left: 4px;
+    width: fit-content;
+}
+
+h1 {
+    font-size: 32px;
+}
+
+.deletion-button {
+    border: 1px solid red;
+    color: white;
+    background-color: #dd787d;
+    size: 120%;
+    font-size: inherit;
+    margin-left: 4px;
+}
+
+.separator {
+    height: 2px;
+    color: white;
+    background-color: white;
+}
+
+#overdue-info {
+    font-size: 14px;
+    font-style: italic;
+}
+
+#book-to-delete {
+    border: 1px solid red;
+    color: white;
+    background-color: #dd787d;
+    size: 120%;
+    font-size: inherit;
+}
+
+

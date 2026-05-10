@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="style.css"></style>
+    <script src="script.js" defer></script>
+    <title>Web Library</title>
+</head>
+<body>
+    <h1>Web Library</h1>
+    <hr class="separator">
+    <div id="borrower-selection">
+        <fieldset>
+                    <legend>Borrower</legend>
+                    <label for="borrowers">Library card ID:&nbsp</label>
+                    <select name="borrowers" id="borrower-select">
+                        <!--updates every time new user is created-->
+                        <option value="empty" selected>No borrowers registered</option>
+                    </select>
+        </fieldset>
+    </div>
+    <hr>
+    <div id="book-borrowing">
+        <fieldset>
+            <legend>Borrow</legend>
+            <label for="book-by-id">Choose desired book ID:&nbsp</label>
+            <select name="book-by-id" id="books">
+                <!--also update, but fill only with available books-->
+                <option value="empty" selected>No books available</option>
+            </select>
+            <br>
+            <p>or</p>
+            <label for="book-by-title">Enter book's title:&nbsp</label>
+            <input type="text" name="book-by-title" id="title"/>
+            <br><br>
+            <button type="button" id="borrow">Borrow book</button>
+        </fieldset>
+    </div>
+    <hr>
+    <div id="book-returning">
+        <fieldset>
+            <legend>Return</legend>
+            <label for="book-by-id-ret">Choose book you want to return ID:&nbsp</label>
+            <select name="book-by-id-ret" id="books-to-return">
+                <!--also update, but fill only with available books-->
+                <option value="empty" selected>No books borrowed</option>
+            </select>
+            <br>
+            <p>or</p>
+            <label for="book-by-title-ret">Enter book's title:&nbsp</label>
+            <input type="text" name="book-by-title-ret" id="title-ret"/>
+            <br><br>
+            <button type="button" id="return">Return book</button>
+            <span id="overdue-info">&nbsp&nbspBook overdue! You'll be fined!</span><!--to be hidden by default in script.js-->
+        </fieldset>
+    </div>
+    <hr>
+    <br><br><br><br>
+    <hr class="separator">
+    <div id="borrower-deletion">
+        <fieldset>
+            <legend>Borrower deletion</legend>
+            <label for="delete-user">Remove current borrower from library management system:&nbsp</label>
+            <button type="button" name="delete-user" id="delete-user" class="deletion-button">Delete borrower</button>
+        </fieldset>
+    </div>
+    <hr>
+    <div id="book-deletion">
+        <fieldset>
+            <legend>Book deletion</legend>
+            <label for="book-to-delete">Choose ID of a book to remove from the library:&nbsp</label>
+            <select name="book-to-delete" id="book-to-delete">
+                <option value="empty" selected>No books available</option>
+                <!--display only books that are in the database and not deleted-->
+            </select>
+            <button type="button" id="delete-user" class="deletion-button">Delete book</button>
+        </fieldset>
+    </div>
+    <hr class="separator">
+</body>
+</html>
