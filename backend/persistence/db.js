@@ -11,10 +11,10 @@ console.log('Connected to the database.');
 dbInit();
 module.exports = db;
 
-db.close((err) => {
-    if (err) { console.error(err.message); }
-    console.log('Close the database connection.');
-});
+// db.close((err) => {
+//     if (err) { console.error(err.message); }
+//     console.log('Closing the database connection.');
+// });
 
 
 function dbInit() {
@@ -27,7 +27,6 @@ function dbInit() {
                 fines INTEGER
             )`, (err) => {
             if (err) console.error(err.message);
-            else console.log("table 'library_card' created");
         });
         db.run(`
             CREATE TABLE IF NOT EXISTS books (
@@ -37,7 +36,6 @@ function dbInit() {
                 availability INTEGER NOT NULL DEFAULT 1 
             )`, (err) => {
             if (err) console.error(err.message);
-            else console.log("table 'books' created.");
         });
         db.run(`
             CREATE TABLE IF NOT EXISTS borrowings (
@@ -50,7 +48,6 @@ function dbInit() {
                 FOREIGN KEY (book_id) REFERENCES books(id)
             )`, (err) => {
             if (err) console.error(err.message);
-            else console.log("table 'borrowings' created.");
         });
     });
 }

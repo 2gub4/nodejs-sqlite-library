@@ -13,11 +13,13 @@ class LibraryCardDto {
 }
 
 // declarations and variables
-const BASE_URL = "http://localhost:3000/";
+const BASE_URL = "http://localhost:3000";
 
 
 //      borrowings
 const borrowerSelect = document.getElementById('borrower-select');
+const emptyBorrowerOption = document.getElementById('empty-borrower-option');
+const defaultBorrowerOption = document.createElement('option');
 const bookToBorrowSelect = document.getElementById('book-by-id');
 const bookToBorrowTitleInput = document.getElementById('book-title');
 const borrowBookButton = document.getElementById('borrow');
@@ -44,17 +46,18 @@ const newBookTitleInput = document.getElementById('book-title');
 const newBookAuthorInput = document.getElementById('book-author');
 const addBookButton = document.getElementById('add-book');
 
-// initial state
-overdueInfo.style.display = 'none';
+//      searches
+const searchTitleInput = document.getElementById('book-search-title');
+const searchBookButton = document.getElementById('search-book');
 
-//download list of borrowers and books from the API 
-let availableBooks = getAvailableBooksIdsList(); // await?
-let availableBorrowers = getAvailableBorrowersIdsList(); //await?
 
-generateOptionsForAvailableBooks(availableBooks); //await?
-generateOptionsForAvailableBorrowers(availableBorrowers); //await?
+let borrowableBooks;
+let returnableBooks;
+let availableBorrowers;
+let currentBorrowerId;
 
-let currentBorrowerId = borrowerSelect.value;
+//  initialization
+initWebsite();
 
 
 // event listeners
@@ -81,37 +84,59 @@ addBookForm.addEventListener('submit', async (event) => {
 });
 
 // functions
-async function getAvailableBooksIdsList() {
-    //call api -> get list of available books -> return list of ids
+async function initWebsite() {
+    overdueInfo.style.display = 'none';
+    borrowableBooks = await getAvailableIds('borrowable_books');
+    returnableBooks = await getAvailableIds('returnable_books');
+    availableBorrowers = await getAvailableIds('borrowers');
+    populateSelectOptions(borrowerSelect, availableBorrowers);
+    populateSelectOptions(bookToBorrowSelect, borrowableBooks);
+    populateSelectOptions(bookToReturnSelect, returnableBooks);
+    populateSelectOptions(bookToDeleteSelect, borrowableBooks/*[...borrowableBooks, ...returnableBooks]*/);
+    //currentBorrowerId
 }
-async function getAvailableBorrowersIdsList() {
-    //call api -> get list of available borrowers -> return list of ids
-}
 
-function initPage() {
-
-}
-
-
-
-function generateOptionsForAvailableBooks(availableBooks) {
-    if (availableBooks.length !== 0) {
-        availableBooks.forEach(id => {
-            const option = document.createElement('option');
-            option.value = id;
-            option.textContent = `${id}`;
-            bookToBorrowSelect.appendChild(option);
-        });
+async function getAvailableIds(target) {
+    try {
+        const response = await fetch(
+            `${BASE_URL}/${target}_ids`,
+            {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${target} ids: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data;
+    }
+    catch (err) {
+        console.error(`Error fetching ${target} ids:`, err);
     }
 }
 
-function generateOptionsForAvailableBorrowers(availableBorrowers) {
-    if (availableBorrowers.length !== 0) {
-        availableBorrowers.forEach(id => {
+
+function populateSelectOptions(targetSelect, idList) {
+    targetSelect.replaceChildren();
+    if (idList && idList.length !== 0) {
+        const defaultOption = document.createElement('option');
+        defaultOption.value = "default";
+        defaultOption.textContent = "--- select an option ---";
+        defaultOption.selected = true;
+        defaultOption.disabled = true;        
+        targetSelect.appendChild(defaultOption);
+        idList.forEach(id => {
             const option = document.createElement('option');
             option.value = id;
-            option.textContent = `${id}`;
-            borrowerSelect.appendChild(option);
-        }); 
+            option.textContent = id;
+            targetSelect.appendChild(option);
+        });
+    } else {
+        const emptyOption = document.createElement('option');
+        emptyOption.value = "empty";
+        emptyOption.textContent = "no data available";
+        emptyOption.selected = true;
+        targetSelect.appendChild(emptyOption);
     }
 }

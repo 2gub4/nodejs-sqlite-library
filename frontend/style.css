@@ -19,6 +19,7 @@ select {
     size: 120%;
     font-size: inherit;
     background-color: white;
+    padding: 2px;
 }
 
 hr {

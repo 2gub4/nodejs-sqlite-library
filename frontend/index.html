@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="style.css"></style>
+    <!--<link rel="icon" type="image/x-icon" href="/favicon.ico">-->
+    <link rel="stylesheet" href="./style.css">
     <script src="script.js" defer></script>
     <title>Web Library</title>
 </head>
@@ -70,20 +70,6 @@
     <hr class="separator">
     <div id="search-library">
         <h2>Search</h2>
-        <div id="book-searching">
-            <fieldset>
-                <br>
-                <legend>Search book</legend>
-                <label for="book-search-id">Book ID:&nbsp</label>
-                <select name="book-search-id" id="book-search-id">
-                    <!--also update, but fill only with available books-->
-                    <option value="empty" selected>No books available</option>
-                </select>
-                <button type="button" id="search-book">Search book</button>
-                <br>
-            </fieldset>
-        </div>
-        <br><br>
         <div id="search-lib-cards">
             <fieldset>
                 <br>
@@ -94,6 +80,17 @@
                     <option value="empty" selected>No borrowers available</option>
                 </select>
                 <button type="button" id="search-borrower">Search borrower</button>
+                <br>
+            </fieldset>
+        </div>
+        <br><br>
+        <div id="book-searching">
+            <fieldset>
+                <br>
+                <legend>Search book</legend>
+                <label for="book-search-title">Book title:&nbsp</label>
+                <input type="text" name="book-search-title" id="book-search-title"/>
+                <button type="button" id="search-book">Search book</button>
                 <br>
             </fieldset>
         </div>
