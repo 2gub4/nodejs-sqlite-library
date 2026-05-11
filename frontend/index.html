@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!--<link rel="icon" type="image/x-icon" href="/favicon.ico">-->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="./style.css">
     <script src="script.js" defer></script>
     <title>Web Library</title>
@@ -17,7 +17,6 @@
                 <legend>Choose borrower</legend>
                 <label for="borrowers">Library card ID:&nbsp</label>
                 <select name="borrowers" id="borrower-select">
-                    <!--updates every time new user is created-->
                     <option id="empty-borrower-option" value="empty" selected>No borrowers registered</option>
                     <option value="default"></option>
                     <option value="1">1</option>
@@ -34,7 +33,6 @@
                 <legend>Borrow</legend>
                 <label for="book-by-id">Choose desired book ID:&nbsp</label>
                 <select name="book-by-id" id="book-by-id">
-                    <!--also update, but fill only with available books-->
                     <option value="empty" selected>No books available</option>
                 </select>
                 <br>
@@ -52,9 +50,7 @@
                 <legend>Return</legend>
                 <label for="book-by-id-ret">Choose book you want to return ID:&nbsp</label>
                 <select name="book-by-id-ret" id="book-to-return">
-                    <!--also update, but fill only with available books-->
                     <option value="empty" selected>No books borrowed</option>
-
                 </select>
                 <br>
                 <p>or</p>
@@ -62,7 +58,7 @@
                 <input type="text" name="book-by-title-ret" id="title-ret"/>
                 <br><br>
                 <button type="button" id="return">Return book</button>
-                <span id="overdue-info">&nbsp&nbspBook overdue! You'll be fined!</span><!--to be hidden by default in script.js-->
+                <span id="overdue-info">&nbsp&nbspBook overdue! You'll be fined!</span>
             </fieldset>
         </div>
     </div>
@@ -102,6 +98,7 @@
                 <legend>Borrower deletion</legend>
                 <label for="delete-borrower">Remove current borrower from library management system:&nbsp</label>
                 <button type="button" name="delete-user" id="delete-borrower" class="deletion-button">Delete borrower</button>
+                <span id="deletion-info"></span>
             </fieldset>
         </div>
         <br>
@@ -112,9 +109,8 @@
                 <label for="book-to-delete">Choose ID of a book to remove from the library:&nbsp</label>
                 <select name="book-to-delete" id="book-to-delete">
                     <option value="empty" selected>No books available</option>
-                    <!--display only books that are in the database and not deleted-->
                 </select>
-                <button type="button" id="delete-book" class="deletion-button">Delete book</button>
+                <button type="button" id="delete-book" class="deletion-button">Delete book</button><span id="deletion-info-book"></span>
             </fieldset>
         </div>
     </div>

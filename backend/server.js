@@ -1,9 +1,11 @@
-//imports
 const express = require('express');
 const path = require('path');
 const { Temporal } = require('@js-temporal/polyfill');
+const Book = require('./models/book.js');
+const Borrowing = require('./models/borrowing.js');
+const Borrower = require('./models/librarycard.js');
 
-//constants
+
 const PORT = 3000;
 const DB_PATH = path.join(__dirname, 'persistence', 'db.js');
 const HOST_NAME = 'localhost';
@@ -35,7 +37,7 @@ app.get('/books_ids/:mode', (req, res) => {
 
 
 app.get('/borrowers_ids/:mode', async (req, res) => {
-  db.all('SELECT id FROM library_card;', [], (err, rows) => {
+  db.all('SELECT id FROM library_cards;', [], (err, rows) => {
     if (err) {
       console.error("database error:", err);
       return res.status(500).json({ error: 'Internal server error' });
@@ -60,11 +62,25 @@ app.get('/borrowing/:id', async(req, res) => {
 
 //  posts
 app.post('/book', async (req, res) => {
-  
+  const book = Book.buildFromJson(req.body);
+  db.run('INSERT INTO books (title, author) VALUES (?, ?);', [book.title, book.author], function(err) {
+    if (err) {
+      console.error("database error:", err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    res.status(201).json({ message: 'Book added successfully' });
+  });
 });
 
 app.post('/borrower', async (req, res) => {
-  
+  const borrower = Borrower.buildFromJson(req.body);
+  db.run('INSERT INTO library_cards (owner) VALUES (?);', [borrower.owner], function(err) {
+    if (err) {
+      console.error("database error:", err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    res.status(201).json({ message: 'Borrower added successfully' });
+  });
 });
 
 app.post('/borrow/:uid/:bid', async (req,res) => {
@@ -87,7 +103,7 @@ app.delete('/book/:id', async (req, res) => {
 });
 
 app.delete('/borrower/:id', (req, res) => {
-  db.run('DELETE FROM library_card WHERE id = ?;', [req.params.id], function(err) {
+  db.run('DELETE FROM library_cards WHERE id = ?;', [req.params.id], function(err) {
     if (err) {
       console.error("database error:", err);
       return res.status(500).json({ error: 'Internal server error' });

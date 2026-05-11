@@ -13,3 +13,5 @@ class Borrowing {
         this.returnDate = Temporal.PlainDate.from(date_string);
     }
 }
+
+module.exports = Borrowing;

@@ -1,6 +1,5 @@
 class LibraryCard {
-    constructor(id, owner) {
-        this.id = id;
+    constructor(owner) {
         this.owner = owner;
         this.borrowedBooks = [];
         this.ownersFines = 0;
@@ -9,4 +8,10 @@ class LibraryCard {
     fineBorrower() {
         this.ownersFines++;
     }
+
+    static buildFromJson(json) {
+        return new LibraryCard(json.owner);
+    }
 }
+
+module.exports = LibraryCard;

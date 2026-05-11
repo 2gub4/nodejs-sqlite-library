@@ -1,8 +1,12 @@
 class Book {
-    constructor(id, title, author, availability) {
-        this.id = id;
+    constructor(title, author) {
         this.title = title;
         this.author = author;
-        this.availability = availability === 1 ? true : false;
+    }
+
+    static buildFromJson(json) {
+        return new Book(json.title, json.author);
     }
 }
+
+module.exports = Book;

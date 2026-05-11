@@ -21,7 +21,7 @@ function dbInit() {
     db.run("PRAGMA foreign_keys = ON;");
     db.serialize(() => {
         db.run(`
-            CREATE TABLE IF NOT EXISTS library_card (
+            CREATE TABLE IF NOT EXISTS library_cards (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 owner TEXT NOT NULL,
                 fines INTEGER

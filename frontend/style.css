@@ -59,7 +59,7 @@ h1 {
     background-color: white;
 }
 
-#overdue-info {
+span {
     font-size: 14px;
     font-style: italic;
 }

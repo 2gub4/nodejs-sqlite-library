@@ -34,6 +34,8 @@ const returnBookButton = document.getElementById('return');
 const bookToDeleteSelect = document.getElementById('book-to-delete');
 const deleteBookButton = document.getElementById('delete-book');
 const deleteBorrowerButton = document.getElementById('delete-borrower');
+const borrowerDeletionInfo = document.getElementById('deletion-info');
+const bookDeletionInfo = document.getElementById('deletion-info-book');
 
 //      additions
 const addBorrowerForm = document.getElementById('borrower-form');
@@ -61,6 +63,7 @@ let bookToBorrowId;
 let bookToReturnId;
 let bookToDeleteId;
 const selects = [borrowerSelect, bookToBorrowSelect, bookToReturnSelect, bookToDeleteSelect];
+const infoSpans = [overdueInfo, borrowerDeletionInfo, bookDeletionInfo];
 
 //  initialization
 initializeWebsite();
@@ -95,27 +98,6 @@ selects.forEach(select => {
     });
 });
 
-addBorrowerForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const form = new FormData(addBorrowerForm);
-    const formData = Object.fromEntries(form);
-    const libCardOwner = `${formData['owner-name']} ${formData['owner-last-name']}`;
-    const borrowerToAdd = new LibraryCardDto(libCardOwner);
-    console.log(borrowerToAdd.owner);
-    //write functions to implement the following:
-    // call api -> cast dto to og class with extra properties -> save borrower to the database
-    // display information on succes/failure
-});
-
-addBookForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const form = new FormData(addBookForm);
-    const formData = Object.fromEntries(form);
-    const bookToAdd = new BookDto(formData['book-title'], formData['book-author']);
-    //write functions to implement the following:
-    // call api -> cast dto to og class with extra properties -> save book to the database
-    // display information on succes/failure
-});
 
 deleteBorrowerButton.addEventListener('click', async () => {
     if (!currentBorrowerId) return;
@@ -126,6 +108,26 @@ deleteBookButton.addEventListener('click', async () => {
     if (!bookToDeleteId) return;
     await deleteBook(bookToDeleteId);
 });
+
+addBorrowerForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = new FormData(addBorrowerForm);
+    const formData = Object.fromEntries(form);
+    const libCardOwner = `${formData['owner-name']} ${formData['owner-last-name']}`;
+    const borrowerToAdd = new LibraryCardDto(libCardOwner);
+    await addBorrower(borrowerToAdd);
+    console.log('borrower added successfully');
+});
+
+addBookForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = new FormData(addBookForm);
+    const formData = Object.fromEntries(form);
+    const bookToAdd = new BookDto(formData['book-title'], formData['book-author']);
+    await addBook(bookToAdd);
+    console.log('book added successfully');
+});
+
 
 // functions
 async function initializeWebsite() {
@@ -171,8 +173,10 @@ async function deleteBorrower(borrowerId) {
             throw new Error(`Error: ${response.status} - ${resJson.error}`);
         }
         await populateSelectOptions(borrowerSelect, await getAvailableIds('borrowers', 'all'));
+        borrowerDeletionInfo.textContent = `   Borrower with id ${borrowerId} has been successfully deleted.`;
     } catch (err) {
         console.log(err);
+        borrowerDeletionInfo.textContent = `   Could not delete borrower with id ${borrowerId}. Such id could not be found in the database.`;
     }
 }
 
@@ -181,6 +185,40 @@ async function deleteBook(bookId) {
         const response = await fetch(
             `${BASE_URL}/book/${bookId}`,
             { method: 'DELETE' }
+        );
+        const resJson = await response.json();
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} - ${resJson.error}`);
+        }
+        await populateAllBookSelects();
+        bookDeletionInfo.textContent = `   Book with id ${bookId} has been successfully deleted.`;
+    } catch (err) {
+        console.log(err);
+        bookDeletionInfo.textContent = `   Could not delete book with id ${bookId}. Such id could not be found in the database.`;
+    }
+}
+
+async function addBorrower(borrowerDto) {
+    try {
+        const response = await fetch(
+            `${BASE_URL}/borrower`,
+            { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(borrowerDto) }
+        );
+        const resJson = await response.json();
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} - ${resJson.error}`);
+        }
+        await populateSelectOptions(borrowerSelect, await getAvailableIds('borrowers', 'all'));
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function addBook(bookDto) {
+    try {
+        const response = await fetch(
+            `${BASE_URL}/book`,
+            { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(bookDto) }
         );
         const resJson = await response.json();
         if (!response.ok) {
