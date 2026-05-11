@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="stylesheet" href="./style.css">
-    <script src="script.js" defer></script>
-    <title>Web Library</title>
-</head>
-<body>
-    <h1>Web Library</h1>
-    <hr class="separator">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="favicon.ico">
+        <link rel="stylesheet" href="./style.css">
+        <script src="script.js" defer></script>
+        <title>Web Library</title>
+    </head>
+    <body>
+        <h1>Web Library</h1>
+        <hr class="separator">
         <div id="borrower-selection">
+            <h2>Borrower</h2>
             <fieldset>
                 <br>
                 <legend>Choose borrower</legend>
@@ -24,6 +25,30 @@
             </fieldset>
         </div>
         <br>
+        <div id="curr-borrowers-books">
+            <fieldset>
+                <legend>Borrower's books</legend>
+                <button type="button" id="show-borrower-books">Show</button>
+                <div id="curr-borrowers-books-result">
+                    <br>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Book ID</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Borrowing date</th>
+                                <th>Due date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="borrower-books-table">
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+            </fieldset>
+            <br>
+        </div>
     <hr class="separator">
     <div id="borrowing-management">
         <h2>Manage borrowings</h2>
@@ -64,6 +89,7 @@
     </div>
     <br><br>
     <hr class="separator">
+    <hr class="separator">
     <div id="search-library">
         <h2>Search</h2>
         <div id="search-lib-cards">
@@ -73,6 +99,22 @@
                 <label for="borrower-search-name">Borrower name:&nbsp</label>
                 <input type="text" name="borrower-search-name" id="borrower-search-name"/>
                 <button type="button" id="search-borrower">Search borrower</button>
+                <div id="borrowers-results">
+                    <br>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Library Card ID</th>
+                                <th>Owner</th>
+                                <th>Total Borrowings</th>
+                                <th>Book ID</th>
+                                <th>Book Title</th>
+                            </tr>
+                            <tbody id="borrowers-table">
+                            </tbody>
+                        </thead>
+                    </table>
+                </div>
                 <br>
             </fieldset>
         </div>
@@ -84,6 +126,22 @@
                 <label for="book-search-title">Book title:&nbsp</label>
                 <input type="text" name="book-search-title" id="book-search-title"/>
                 <button type="button" id="search-book">Search book</button>
+                <div id="books-results">
+                    <br>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Book ID</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Borrower ID</th>
+                                <th>Borrower Name</th>
+                            </tr>
+                            <tbody id="books-table">
+                            </tbody>
+                        </thead>
+                    </table>
+                </div>
                 <br>
             </fieldset>
         </div>

@@ -9,5 +9,27 @@ INSERT INTO books (title, author, availability) VALUES
 ('Solaris', 'Stanisław Lem', 1),
 ('Harry Potter i Kamień Filozoficzny', 'J.K. Rowling', 1);
 
-INSERT INTO borrowings (card_id, book_id) VALUES 
-(2, 2);
+
+BEGIN TRANSACTION;
+
+INSERT INTO borrowings (card_id, book_id, borrow_date, return_date) VALUES 
+(19, 1, CURRENT_TIMESTAMP, datetime('now', '+7 days')),
+(19, 13, CURRENT_TIMESTAMP, datetime('now', '+7 days')),
+(19, 17, CURRENT_TIMESTAMP, datetime('now', '+7 days'));
+
+UPDATE books
+SET availability = 0
+WHERE id IN (1, 13, 17);
+
+
+UPDATE library_cards
+SET total_borrowings = total_borrowings + 3
+WHERE id = 19;
+
+COMMIT;
+
+DELETE FROM borrowings WHERE card_id = 19 AND book_id = 1;
+
+UPDATE library_cards
+SET total_borrowings = 2
+WHERE id = 19;

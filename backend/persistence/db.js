@@ -11,12 +11,6 @@ console.log('Connected to the database.');
 dbInit();
 module.exports = db;
 
-// db.close((err) => {
-//     if (err) { console.error(err.message); }
-//     console.log('Closing the database connection.');
-// });
-
-
 function dbInit() {
     db.run("PRAGMA foreign_keys = ON;");
     db.serialize(() => {

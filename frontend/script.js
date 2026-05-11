@@ -12,6 +12,26 @@ class LibraryCardDto {
     }
 }
 
+class BorrowerSearchResult {
+    constructor(libraryCardId, owner, totalBorrowings, bookId, bookTitle) {
+        this.libraryCardId = libraryCardId;
+        this.owner = owner;
+        this.total_borrowings = totalBorrowings;
+        this.bookId = bookId;
+        this.bookTitle = bookTitle;
+    }
+}
+
+class BookSearchResult {
+    constructor(bookId, title, author, borrowerId, borrowerName) {
+        this.bookId = bookId;
+        this.title = title;
+        this.author = author;
+        this.borrowerId = borrowerId;
+        this.borrowerName = borrowerName;
+    }
+}
+
 // declarations and variables
 const BASE_URL = "http://localhost:3000";
 
@@ -29,6 +49,11 @@ const bookToReturnSelect = document.getElementById('book-to-return');
 const bookToReturnTitleInput = document.getElementById('title-ret');
 const overdueInfo = document.getElementById('overdue-info');
 const returnBookButton = document.getElementById('return');
+
+//      borrower's books
+const borrowersBooksButton = document.getElementById('show-borrower-books');
+const borrowersBooksResults = document.getElementById('curr-borrowers-books-result');
+const borrowersBooksResultsTable = document.getElementById('curr-borrowers-books-table');
 
 //      deletions
 const bookToDeleteSelect = document.getElementById('book-to-delete');
@@ -53,6 +78,11 @@ const searchTitleInput = document.getElementById('book-search-title');
 const searchBookButton = document.getElementById('search-book');
 const searchBorrowerNameInput = document.getElementById('borrower-search-name');
 const searchBorrowerButton = document.getElementById('search-borrower');
+const borrowersResults = document.getElementById('borrowers-results');
+const borrowersResultsTable = document.getElementById('borrowers-table');
+const booksResults = document.getElementById('books-results');
+const booksResultsTable = document.getElementById('books-table');
+
 
 
 let borrowableBooks;
@@ -98,6 +128,29 @@ selects.forEach(select => {
     });
 });
 
+searchBookButton.addEventListener('click', async () => {
+    const title = searchTitleInput.value.trim();
+    if (!title) return;
+    const booksResultsJson = await searchBooks(title);
+    const booksResults = [];
+    booksResultsJson.forEach(result => {
+        const bookResult = new BookSearchResult(result.book_id, result.title, result.author, result.borrower_id, result.borrower_name);
+        booksResults.push(bookResult);
+    });
+    await populateBookSearchResultsTable(booksResultsJson);
+});
+
+searchBorrowerButton.addEventListener('click', async () => {
+    const name = searchBorrowerNameInput.value.trim();
+    if (!name) return;
+    const borrowersResultsJson = await searchBorrowers(name);
+    const borrowersResults = [];
+    borrowersResultsJson.forEach(result => {
+        const borrowerResult = new BorrowerSearchResult(result.borrower_id, result.owner, result.total_borrowings, result.book_id, result.book_title);
+        borrowersResults.push(borrowerResult);
+    });
+    await populateBorrowerSearchResultsTable(borrowersResultsJson);
+});
 
 deleteBorrowerButton.addEventListener('click', async () => {
     if (!currentBorrowerId) return;
@@ -132,6 +185,9 @@ addBookForm.addEventListener('submit', async (event) => {
 // functions
 async function initializeWebsite() {
     overdueInfo.style.display = 'none';
+    borrowersResults.style.display = 'none';
+    booksResults.style.display = 'none';
+    borrowersBooksResults.style.display = 'none';
     borrowableBooks = await getAvailableIds('books', 1);
     returnableBooks = await getAvailableIds('books', 0);
     availableBorrowers = await getAvailableIds('borrowers', 'all');
@@ -139,7 +195,7 @@ async function initializeWebsite() {
     await populateSelectOptions(bookToBorrowSelect, borrowableBooks);
     await populateSelectOptions(bookToReturnSelect, returnableBooks);
     await populateSelectOptions(bookToDeleteSelect, borrowableBooks);
-    //currentBorrowerId <- maybe some default value to prevent some actions
+    
 }
 
 async function getAvailableIds(target, mode) {
@@ -161,6 +217,46 @@ async function getAvailableIds(target, mode) {
         console.error(`Error fetching ${target} ids:`, err);
     }
 }
+
+async function searchBooks(title) {
+    try {
+        const response = await fetch(
+            `${BASE_URL}/book/${title}`,
+            {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to fetch book: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data;
+    }
+    catch (err) {
+        console.error(`Error searching books:`, err);
+    }
+}
+
+async function searchBorrowers(name) {
+    try {
+        const response = await fetch(
+            `${BASE_URL}/borrower/${name}`,
+            { 
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+             }
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to fetch borrower: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (err) {
+        console.error(`Error searching borrowers:`, err);
+    }
+}
+
 
 async function deleteBorrower(borrowerId) {
     try {
@@ -259,4 +355,36 @@ async function populateAllBookSelects() {
     await populateSelectOptions(bookToBorrowSelect, await getAvailableIds('books', 1));
     await populateSelectOptions(bookToReturnSelect, await getAvailableIds('books', 0));
     await populateSelectOptions(bookToDeleteSelect, await getAvailableIds('books', 1));
+}
+
+async function populateBorrowerSearchResultsTable(results) {
+    borrowersResultsTable.replaceChildren();
+    borrowersResults.style.display = 'block';
+    results.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${row.borrower_id}</td>
+            <td>${row.owner}</td>
+            <td>${row.total_borrowings}</td>
+            <td>${row.book_id ?? ""}</td>
+            <td>${row.book_title ?? ""}</td>
+        `;
+        borrowersResultsTable.appendChild(tr);
+    });
+}
+
+async function populateBookSearchResultsTable(results) {
+    booksResultsTable.replaceChildren();
+    booksResults.style.display = 'block';
+    results.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${row.book_id}</td>
+            <td>${row.title}</td>
+            <td>${row.author}</td>
+            <td>${row.borrower_id ?? ""}</td>
+            <td>${row.borrower_name ?? ""}</td>
+        `;
+        booksResultsTable.appendChild(tr);
+    });
 }

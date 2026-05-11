@@ -43,21 +43,71 @@ app.get('/borrowers_ids/:mode', async (req, res) => {
       return res.status(500).json({ error: 'Internal server error' });
     }
     const ids = rows.map(row => row.id);
-    res.json(ids); 
+    return res.json(ids); 
   });
 });
 
-app.get('/book/:id', async (req, res) => {
+// app.get('/book/:title', async (req, res) => {
+//   db.all('SELECT * FROM books WHERE title = ?;', [req.params.title], (err, rows) => {
+//     if (err) {
+//       console.error("database error:", err);
+//       return res.status(500).json({ error: 'Internal server error' });
+//     }
+//     if (!rows) {
+//       return res.status(404).json({ error: 'no such book in db' });
+//     }
+//     return res.status(200).json(rows);
+//   });
+// });
 
+app.get('/borrower/:name', async (req, res) => {
+  db.all(
+    `SELECT 
+      lc.id AS borrower_id,
+      lc.owner,
+      lc.total_borrowings,
+      b.id AS book_id,
+      b.title AS book_title
+    FROM library_cards lc
+    LEFT JOIN borrowings br ON lc.id = br.card_id
+    LEFT JOIN books b ON br.book_id = b.id
+    WHERE lc.owner = ?;`, 
+    [req.params.name], (err, rows) => {
+    if (err) {
+      console.error("database error:", err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    if (!rows) {
+      return res.status(404).json({ error: 'no such borrower in db' });
+    }    
+    return res.status(200).json(rows);
+  });
 });
 
-app.get('/borrower/:id', async (req, res) => {
-
+app.get('/book/:title', async (req, res) => {
+  db.all(
+    `SELECT
+      b.id AS book_id,
+      b.title,
+      b.author,
+      lc.id AS borrower_id,
+      lc.owner AS borrower_name
+    FROM books b
+    LEFT JOIN borrowings br ON b.id = br.book_id
+    LEFT JOIN library_cards lc ON br.card_id = lc.id
+    WHERE b.title = ?;`, 
+    [req.params.title], (err, rows) => {
+      if (err) {
+        console.error("database error:", err);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
+      if (!rows) {
+        return res.status(404).json({ error: 'no such book in db' });
+      }
+      return res.status(200).json(rows);
+    });
 });
 
-app.get('/borrowing/:id', async(req, res) => {
-
-});
 
 
 //  posts
@@ -103,16 +153,48 @@ app.delete('/book/:id', async (req, res) => {
 });
 
 app.delete('/borrower/:id', (req, res) => {
-  db.run('DELETE FROM library_cards WHERE id = ?;', [req.params.id], function(err) {
-    if (err) {
-      console.error("database error:", err);
-      return res.status(500).json({ error: 'Internal server error' });
-    }
-    if (this.changes === 0) {
-      return res.status(404).json({ error: 'Borrower not found' });
-    }
-    res.json({ message: `Borrower deleted successfully. Borrower's ID: ${req.params.id}` });
-  });
+    const borrowerId = req.params.id;
+    db.run('BEGIN TRANSACTION;', (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+        const updateBooksQuery = `
+            UPDATE books 
+            SET availability = 1 
+            WHERE id IN (SELECT book_id FROM borrowings WHERE card_id = ?);
+        `;
+        db.run(updateBooksQuery, [borrowerId], (err) => {
+            if (err) {
+                console.error(err);
+                return db.run('ROLLBACK;', () => res.status(500).json({ error: 'Internal server error' }));
+            }
+            db.run('DELETE FROM borrowings WHERE card_id = ?;', [borrowerId], (err) => {
+                if (err) {
+                    console.error(err);
+                    return db.run('ROLLBACK;', () => res.status(500).json({ error: 'Internal server error' }));
+                }
+                db.run('DELETE FROM library_cards WHERE id = ?;', [borrowerId], function(err) {
+                    if (err) {
+                        console.error(err);
+                        return db.run('ROLLBACK;', () => res.status(500).json({ error: 'Internal server error' }));
+                    }
+                    if (this.changes === 0) {
+                        return db.run('ROLLBACK;', () => res.status(404).json({ error: 'Borrower not found' }));
+                    }
+                    db.run('COMMIT;', (err) => {
+                        if (err) {
+                            console.error(err);
+                            return db.run('ROLLBACK;', () => res.status(500).json({ error: 'Internal server error' }));
+                        }
+                        res.json({ 
+                            message: `Borrower deleted successfully. Books returned. Borrower's ID: ${borrowerId}` 
+                        });
+                    });
+                });
+            });
+        });
+    });
 });
 
 //  puts
