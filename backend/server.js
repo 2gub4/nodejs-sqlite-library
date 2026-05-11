@@ -35,6 +35,26 @@ app.get('/books_ids/:mode', (req, res) => {
   });
 });
 
+app.get('/borrowed_books/:borrower_id', (req, res) => {
+  db.all(`
+    SELECT
+      b.id AS book_id,
+      b.title AS book_title,
+      b.author AS book_author,
+      br.borrow_date,
+      br.return_date
+    FROM library_cards lc
+    LEFT JOIN borrowings br ON lc.id = br.card_id
+    LEFT JOIN books b ON br.book_id = b.id
+    WHERE lc.id = ?;`, [req.params.borrower_id], (err, rows) => {
+      if (err) {
+        console.error("database error:", err);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
+      return res.status(200).json(rows);
+    }
+  );
+});
 
 app.get('/borrowers_ids/:mode', async (req, res) => {
   db.all('SELECT id FROM library_cards;', [], (err, rows) => {
@@ -46,19 +66,6 @@ app.get('/borrowers_ids/:mode', async (req, res) => {
     return res.json(ids); 
   });
 });
-
-// app.get('/book/:title', async (req, res) => {
-//   db.all('SELECT * FROM books WHERE title = ?;', [req.params.title], (err, rows) => {
-//     if (err) {
-//       console.error("database error:", err);
-//       return res.status(500).json({ error: 'Internal server error' });
-//     }
-//     if (!rows) {
-//       return res.status(404).json({ error: 'no such book in db' });
-//     }
-//     return res.status(200).json(rows);
-//   });
-// });
 
 app.get('/borrower/:name', async (req, res) => {
   db.all(
