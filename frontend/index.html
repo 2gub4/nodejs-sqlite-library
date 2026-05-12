@@ -18,9 +18,6 @@
                 <legend>Choose borrower</legend>
                 <label for="borrowers">Library card ID:&nbsp</label>
                 <select name="borrowers" id="borrower-select">
-                    <option id="empty-borrower-option" value="empty" selected>No borrowers registered</option>
-                    <option value="default"></option>
-                    <option value="1">1</option>
                 </select>
             </fieldset>
         </div>
@@ -58,12 +55,7 @@
                 <legend>Borrow</legend>
                 <label for="book-by-id">Choose desired book ID:&nbsp</label>
                 <select name="book-by-id" id="book-by-id">
-                    <option value="empty" selected>No books available</option>
                 </select>
-                <br>
-                <p>or</p>
-                <label for="book-by-title">Enter book's title:&nbsp</label>
-                <input type="text" name="book-by-title" id="book-title"/>
                 <br><br>
                 <button type="button" id="borrow">Borrow book</button>
             </fieldset>
@@ -73,14 +65,9 @@
             <fieldset>
                 <br>
                 <legend>Return</legend>
-                <label for="book-by-id-ret">Choose book you want to return ID:&nbsp</label>
+                <label for="book-by-id-ret">Choose book you want to return:&nbsp</label>
                 <select name="book-by-id-ret" id="book-to-return">
-                    <option value="empty" selected>No books borrowed</option>
                 </select>
-                <br>
-                <p>or</p>
-                <label for="book-by-title-ret">Enter book's title:&nbsp</label>
-                <input type="text" name="book-by-title-ret" id="title-ret"/>
                 <br><br>
                 <button type="button" id="return">Return book</button>
                 <span id="overdue-info">&nbsp&nbspBook overdue! You'll be fined!</span>
@@ -165,7 +152,6 @@
                 <legend>Book deletion</legend>
                 <label for="book-to-delete">Choose ID of a book to remove from the library:&nbsp</label>
                 <select name="book-to-delete" id="book-to-delete">
-                    <option value="empty" selected>No books available</option>
                 </select>
                 <button type="button" id="delete-book" class="deletion-button">Delete book</button><span id="deletion-info-book"></span>
             </fieldset>

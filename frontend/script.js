@@ -48,8 +48,6 @@ const BASE_URL = "http://localhost:3000";
 
 //      borrowings
 const borrowerSelect = document.getElementById('borrower-select');
-const emptyBorrowerOption = document.getElementById('empty-borrower-option');
-const defaultBorrowerOption = document.createElement('option');
 const bookToBorrowSelect = document.getElementById('book-by-id');
 const bookToBorrowTitleInput = document.getElementById('book-title');
 const borrowBookButton = document.getElementById('borrow');
@@ -102,7 +100,7 @@ let currentBorrowerId;
 let bookToBorrowId;
 let bookToReturnId;
 let bookToDeleteId;
-const selects = [borrowerSelect, bookToBorrowSelect, bookToReturnSelect, bookToDeleteSelect];
+const selects = [bookToBorrowSelect, bookToReturnSelect, bookToDeleteSelect];
 const infoSpans = [overdueInfo, borrowerDeletionInfo, bookDeletionInfo];
 
 //  initialization
@@ -111,31 +109,32 @@ initializeWebsite();
 
 // event listeners
 selects.forEach(select => {
-    select.addEventListener('change', (event) => {
+    select.addEventListener('change', async (event) => {
         selectId = event.target.id;
         selectValue = event.target.value;
         if (selectValue === "default" || selectValue === "empty") return;
         switch (selectId) {
-            case 'borrower-select':
-                currentBorrowerId = selectValue;
-                //console.log(`current borrower id: ${currentBorrowerId}`);
-                break;
             case 'book-by-id':
                 bookToBorrowId = selectValue;
-                //console.log(`book to borrow id: ${bookToBorrowId}`);
                 break;
             case 'book-to-return':
                 bookToReturnId = selectValue;
-                //console.log(`book to return id: ${bookToReturnId}`);
                 break;
             case 'book-to-delete':
                 bookToDeleteId = selectValue;
-                //console.log(`book to delete id: ${bookToDeleteId}`);
                 break;
             default:
-                console.error(`unknown select id: ${selectId}`);
+                // console.error(`unknown select id: ${selectId}`);
+                console.log('borrowerSelect in action');
         }
     });
+});
+
+borrowerSelect.addEventListener('change', async (event) => {
+    const selectedId = event.target.value;
+    currentBorrowerId = (selectedId === "default" || selectedId === "empty") ? null : selectedId;
+    const books = await getAvailableIds('books', 0); 
+    await populateSelectOptions(bookToReturnSelect, books);
 });
 
 currentBorrowerBooksButton.addEventListener('click', async () => {
@@ -147,6 +146,20 @@ currentBorrowerBooksButton.addEventListener('click', async () => {
         borrowersBooksResults.push(borrowedBook);
     });
     await populateCurrentBorrowerBooksTable(borrowersBooksResults); 
+});
+
+borrowBookButton.addEventListener('click', async () => {
+    if (!currentBorrowerId) return;
+    if (!bookToBorrowId) return; 
+    await borrowBookById(currentBorrowerId, bookToBorrowId);
+    await populateAllBookSelects();
+});
+
+returnBookButton.addEventListener('click', async () => {
+    if (!currentBorrowerId) return;
+    if (!bookToReturnId) return; 
+    await returnBookById(currentBorrowerId, bookToReturnId);
+    await populateAllBookSelects();
 });
 
 searchBookButton.addEventListener('click', async () => {
@@ -211,7 +224,7 @@ async function initializeWebsite() {
     currentBorrowersBookResults.style.display = 'none';
     borrowableBooks = await getAvailableIds('books', 1);
     returnableBooks = await getAvailableIds('books', 0);
-    availableBorrowers = await getAvailableIds('borrowers', 'all');
+    availableBorrowers = await getAvailableIds('borrowers', -1);
     await populateSelectOptions(borrowerSelect, availableBorrowers);
     await populateSelectOptions(bookToBorrowSelect, borrowableBooks);
     await populateSelectOptions(bookToReturnSelect, returnableBooks);
@@ -220,9 +233,13 @@ async function initializeWebsite() {
 }
 
 async function getAvailableIds(target, mode) {
+    let potentialId = -1;
+    if (mode === 0 && typeof currentBorrowerId !== 'undefined' && currentBorrowerId !== null) {
+        potentialId = currentBorrowerId;
+    }
     try {
         const response = await fetch(
-            `${BASE_URL}/${target}_ids/${mode}`,
+            `${BASE_URL}/${target}_ids/${mode}/${potentialId}`,
             {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
@@ -358,6 +375,40 @@ async function addBook(bookDto) {
         if (!response.ok) {
             throw new Error(`Error: ${response.status} - ${resJson.error}`);
         }
+        await populateAllBookSelects();
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function borrowBookById(borrowerId, bookId) {
+    try {
+        const response = await fetch(
+            `${BASE_URL}/borrow/${borrowerId}/${bookId}`,
+            { method: 'POST' }
+        );
+        const resJson = await response.json();
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} - ${resJson.error}`);
+        }
+        console.log("successfully borrowed book");
+        await populateAllBookSelects();
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function returnBookById(borrowerId, bookId) {
+    try {
+        const response = await fetch(
+            `${BASE_URL}/return/${borrowerId}/${bookId}`,
+            { method: 'PUT' }
+        );
+        const resJson = await response.json();
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} - ${resJson.error}`);
+        }
+        console.log("successfully returned book");
         await populateAllBookSelects();
     } catch (err) {
         console.log(err);
